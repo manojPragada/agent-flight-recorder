@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "spans": [
+    {
+      "id": "s1",
+      "tool": "search",
+      "duration_ms": 125,
+      "status": "ok",
+      "tokens": 0
+    },
+    {
+      "id": "s2",
+      "tool": "model",
+      "duration_ms": 800,
+      "status": "ok",
+      "tokens": 240
+    },
+    {
+      "id": "s3",
+      "tool": "fetch",
+      "duration_ms": 200,
+      "status": "error",
+      "tokens": 0
+    }
+  ]
+}
