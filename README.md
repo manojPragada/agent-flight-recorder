@@ -21,6 +21,12 @@ Trace format: a JSON object with `version: 1` and `spans`. Each span needs uniqu
 
 Run `python app.py --help` for available options.
 
+## Hierarchy and timing
+
+Spans may include `parent_id` pointing to another span, or null for a root. Unknown parents and cycles are rejected. `root_span_ids` and `max_depth` summarize the validated hierarchy (roots have depth 1).
+
+Optional `start_ms` is a non-negative offset from a shared trace origin. Supply it for **all spans or none**. When supplied, child intervals must fit within their parent. The summary adds `timing.elapsed_ms` (last end minus first start) and `timing.busy_ms` (union of span intervals, excluding idle gaps). Parent and overlapping child durations are never counted twice in busy time. These metrics are not a dependency-based critical path. Without timestamps `timing` is null.
+
 ## Development and verification
 
 ```bash
@@ -28,7 +34,7 @@ python -m unittest discover -s tests -v
 python -m compileall -q app.py tests
 ```
 
-Tests exercise behavior with temporary/local data. PufferFish's recording test uses only a loopback HTTP server. There is no build step or configured linter; compilation is a syntax check, not linting.
+Tests exercise trace validation, hierarchy and overlapping/disjoint interval calculations without network access. There is no build step or configured linter; compilation is a syntax check, not linting.
 
 ## Configuration
 
@@ -38,7 +44,7 @@ Configuration is provided through CLI arguments. No environment variables, `.env
 
 ```text
 app.py          CLI and core domain functions
-examples/       synthetic example inputs (queue-lab uses commands above)
+examples/       synthetic example inputs
 tests/          behavioral unit tests
 ROADMAP.md      completed work and prioritized next steps
 .env.example    configuration notes
@@ -52,7 +58,7 @@ A single dependency-free module exposes importable core functions and a CLI entr
 
 ## Limitations
 
-`summed_duration_ms` sums span durations; overlapping calls mean this is not wall-clock runtime. Tokens are supplied by the trace author, not measured by this tool. No live agent integrations, trace hierarchy or visual dashboard yet. Do not place secrets in traces.
+`summed_duration_ms` sums span durations; overlapping calls mean this is not wall-clock runtime. Tokens are supplied by the trace author, not measured by this tool. No live agent integrations or visual dashboard yet. Critical-path analysis is not implemented. Do not place secrets in traces.
 
 ## Running and deployment
 
@@ -70,3 +76,4 @@ Run locally from the repository using the commands above. No hosted deployment h
 Open an issue describing the observed behavior, expected result and a minimal synthetic example. Keep changes focused, include behavioral tests, run the checks above, and update this README when commands or capabilities change. Do not submit credentials or private input files.
 
 Implementation and synthetic examples are original to this repository. There are no third-party runtime dependencies or media assets. A redistribution license has not yet been selected; public visibility alone does not grant an open-source license.
+
