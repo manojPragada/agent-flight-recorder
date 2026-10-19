@@ -42,3 +42,20 @@ class Tests(unittest.TestCase):
     def test_invalid_parent_timestamp_is_order_independent(self):
         t={'version':1,'spans':[{'id':'child','parent_id':'parent','tool':'x','duration_ms':1,'start_ms':0,'status':'ok'},{'id':'parent','tool':'x','duration_ms':10,'start_ms':'invalid','status':'ok'}]}
         with self.assertRaises(ValueError):summarize(t)
+
+
+    def test_longest_dependency_chain(self):
+        t={'version':1,'spans':[{'id':name,'tool':'x','duration_ms':duration,'status':'ok','depends_on':deps} for name,duration,deps in [('a',10,[]),('b',20,['a']),('c',5,['a']),('d',10,['b','c'])]]}
+        self.assertEqual(summarize(t)['critical_path'],{'duration_ms':40,'span_ids':['a','b','d']})
+    def test_dependency_analysis_excludes_inclusive_parent_duration(self):
+        t={'version':1,'spans':[{'id':'root','tool':'agent','duration_ms':100,'status':'ok'},{'id':'a','parent_id':'root','tool':'model','duration_ms':10,'status':'ok','depends_on':[]}]}
+        self.assertEqual(summarize(t)['critical_path'],{'duration_ms':10,'span_ids':['a']})
+    def test_dependency_missing_cycle_and_duplicate_rejected(self):
+        for dependencies in [['missing'],['a'],['a','a'],'a',None]:
+            t=self.trace();t['spans'][0]['depends_on']=dependencies
+            with self.assertRaises(ValueError):summarize(t)
+    def test_dependency_must_finish_before_successor(self):
+        t={'version':1,'spans':[{'id':'a','tool':'x','duration_ms':10,'start_ms':0,'status':'ok','depends_on':[]},{'id':'b','tool':'x','duration_ms':10,'start_ms':5,'status':'ok','depends_on':['a']}]}
+        with self.assertRaises(ValueError):summarize(t)
+    def test_no_dependencies_does_not_invent_critical_path(self):
+        self.assertIsNone(summarize(self.trace())['critical_path'])

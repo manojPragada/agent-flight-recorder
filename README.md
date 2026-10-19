@@ -27,6 +27,12 @@ Spans may include `parent_id` pointing to another span, or null for a root. Unkn
 
 Optional `start_ms` is a non-negative offset from a shared trace origin. Supply it for **all spans or none**. When supplied, child intervals must fit within their parent. The summary adds `timing.elapsed_ms` (last end minus first start) and `timing.busy_ms` (union of span intervals, excluding idle gaps). Parent and overlapping child durations are never counted twice in busy time. These metrics are not a dependency-based critical path. Without timestamps `timing` is null.
 
+## Explicit dependency-path analysis
+
+Leaf spans may declare `depends_on: ["predecessor-id"]`. Once any leaf declares this field, omitted leaf dependencies mean no predecessors. The summary adds `critical_path.duration_ms` and `critical_path.span_ids`: the longest sum of leaf durations over the declared acyclic graph, with deterministic lexical tie-breaking. Inclusive parent spans are excluded to avoid counting their work twice. Dependencies must name leaves; missing IDs, duplicate edges and cycles are rejected. When timestamps exist, each predecessor must end before its successor starts.
+
+This is a duration-weighted dependency path, not measured wall-clock latency: idle gaps and scheduling delays are excluded. Failed spans are included. Without explicit dependencies the value is null; the tool does not infer causality from hierarchy or timing.
+
 ## Development and verification
 
 ```bash
@@ -43,7 +49,8 @@ Configuration is provided through CLI arguments. No environment variables, `.env
 ## Structure
 
 ```text
-app.py          CLI and core domain functions
+app.py          CLI and trace validation
+dependencies.py leaf-span dependency analysis
 examples/       synthetic example inputs
 tests/          behavioral unit tests
 ROADMAP.md      completed work and prioritized next steps
@@ -58,7 +65,7 @@ A single dependency-free module exposes importable core functions and a CLI entr
 
 ## Limitations
 
-`summed_duration_ms` sums span durations; overlapping calls mean this is not wall-clock runtime. Tokens are supplied by the trace author, not measured by this tool. No live agent integrations or visual dashboard yet. Critical-path analysis is not implemented. Do not place secrets in traces.
+`summed_duration_ms` sums span durations; overlapping calls mean this is not wall-clock runtime. Tokens are supplied by the trace author, not measured by this tool. No live agent integrations or visual dashboard yet. Dependency-path analysis requires explicit leaf-span dependencies. Do not place secrets in traces.
 
 ## Running and deployment
 
@@ -76,4 +83,5 @@ Run locally from the repository using the commands above. No hosted deployment h
 Open an issue describing the observed behavior, expected result and a minimal synthetic example. Keep changes focused, include behavioral tests, run the checks above, and update this README when commands or capabilities change. Do not submit credentials or private input files.
 
 Implementation and synthetic examples are original to this repository. There are no third-party runtime dependencies or media assets. A redistribution license has not yet been selected; public visibility alone does not grant an open-source license.
+
 

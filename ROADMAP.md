@@ -9,7 +9,7 @@
 ## Next
 
 - [x] Add validated parent spans and optional relative timestamps
-- [ ] Add dependency-based critical-path analysis
+- [x] Add explicit leaf-dependency critical-path analysis
 - [ ] Build local interactive timeline and failure inspector
 - [ ] Add optional SDK adapters and streaming trace ingestion
 
@@ -19,3 +19,6 @@ Initial foundation implemented and checked on 2026-10-17. Inspect current code a
 
 
 2026-10-18: Added parent validation, cycle detection, hierarchy metrics and interval-union timing. Ten tests pass. Critical-path analysis remains pending; next define dependencies explicitly rather than summing inclusive parent/child durations.
+
+
+2026-10-19: Added duration-weighted critical paths over explicitly declared leaf dependencies, graph validation and timing-consistency checks. Inclusive parent durations and idle time are excluded. Next: local timeline viewer.
