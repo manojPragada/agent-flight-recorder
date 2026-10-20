@@ -61,6 +61,8 @@ ROADMAP.md      completed work and prioritized next steps
 
 ## Architecture
 
+The summary includes `tool_stats`, sorted by exact (case-sensitive) tool name: calls, failures, error rate (0–1), reported tokens, summed/min/max durations and nearest-rank p50/p95 durations. For N calls, percentile p selects sorted index `ceil(N*p)-1`; small samples are not reliable performance estimates. Metrics include every recorded span, including inclusive parent spans, so their sums are not elapsed time and may double-count nested work or tokens. There is no provider billing inference. Non-finite aggregate duration is rejected rather than emitting invalid JSON. `tool_stats.py` keeps aggregation separate from validation and dependency analysis.
+
 A single dependency-free module exposes importable core functions and a CLI entry point. Filesystem and network access occur only when the corresponding commands run. This small foundation will be split into a package, integrations and UI as those features arrive; see the roadmap.
 
 ## Limitations
@@ -83,5 +85,6 @@ Run locally from the repository using the commands above. No hosted deployment h
 Open an issue describing the observed behavior, expected result and a minimal synthetic example. Keep changes focused, include behavioral tests, run the checks above, and update this README when commands or capabilities change. Do not submit credentials or private input files.
 
 Implementation and synthetic examples are original to this repository. There are no third-party runtime dependencies or media assets. A redistribution license has not yet been selected; public visibility alone does not grant an open-source license.
+
 
 

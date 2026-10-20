@@ -59,3 +59,4 @@ class Tests(unittest.TestCase):
         with self.assertRaises(ValueError):summarize(t)
     def test_no_dependencies_does_not_invent_critical_path(self):
         self.assertIsNone(summarize(self.trace())['critical_path'])
+

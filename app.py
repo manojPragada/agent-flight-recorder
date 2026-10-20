@@ -5,6 +5,7 @@ import math
 import sys
 from collections import Counter
 from dependencies import dependency_path
+from tool_stats import tool_statistics
 
 def summarize(trace):
     if not isinstance(trace,dict) or type(trace.get('version')) is not int or trace.get('version') != 1 or not isinstance(trace.get('spans'),list):
@@ -71,7 +72,10 @@ def summarize(trace):
                 left, right = start, end
         busy += right - left
         timing = {'elapsed_ms': max(end for _, end in intervals) - intervals[0][0], 'busy_ms': busy}
+    if not math.isfinite(duration):
+        raise ValueError('Aggregated trace duration must be finite')
     return {'span_count':len(ids),'failures':failures,'summed_duration_ms':duration,'tokens':tokens,'tools':dict(sorted(tools.items())),
+            'tool_stats': tool_statistics(trace['spans']),
             'root_span_ids': sorted(roots), 'max_depth': max_depth, 'timing': timing, 'critical_path': dependency_path(spans)}
 
 def main():
@@ -81,5 +85,6 @@ def main():
         print(json.dumps(summarize(trace),indent=2));return 0
     except (OSError,ValueError) as exc:print(str(exc),file=sys.stderr);return 2
 if __name__=='__main__':sys.exit(main())
+
 
 

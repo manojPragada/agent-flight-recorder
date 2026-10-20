@@ -43,3 +43,4 @@ def dependency_path(spans):
         return {'duration_ms': 0, 'span_ids': []}
     duration, path = min(best.values(), key=lambda item: (-item[0], item[1]))
     return {'duration_ms': duration, 'span_ids': path}
+
