@@ -37,7 +37,7 @@ This is a duration-weighted dependency path, not measured wall-clock latency: id
 
 ```bash
 python -m unittest discover -s tests -v
-python -m compileall -q app.py tests
+python -m compileall -q app.py dependencies.py tool_stats.py tests
 ```
 
 Tests exercise trace validation, hierarchy and overlapping/disjoint interval calculations without network access. There is no build step or configured linter; compilation is a syntax check, not linting.
@@ -50,6 +50,7 @@ Configuration is provided through CLI arguments. No environment variables, `.env
 
 ```text
 app.py          CLI and trace validation
+tool_stats.py   per-tool latency, failures and reported-token aggregation
 dependencies.py leaf-span dependency analysis
 examples/       synthetic example inputs
 tests/          behavioral unit tests
@@ -63,7 +64,7 @@ ROADMAP.md      completed work and prioritized next steps
 
 The summary includes `tool_stats`, sorted by exact (case-sensitive) tool name: calls, failures, error rate (0–1), reported tokens, summed/min/max durations and nearest-rank p50/p95 durations. For N calls, percentile p selects sorted index `ceil(N*p)-1`; small samples are not reliable performance estimates. Metrics include every recorded span, including inclusive parent spans, so their sums are not elapsed time and may double-count nested work or tokens. There is no provider billing inference. Non-finite aggregate duration is rejected rather than emitting invalid JSON. `tool_stats.py` keeps aggregation separate from validation and dependency analysis.
 
-A single dependency-free module exposes importable core functions and a CLI entry point. Filesystem and network access occur only when the corresponding commands run. This small foundation will be split into a package, integrations and UI as those features arrive; see the roadmap.
+The dependency-free CLI in app.py validates and summarizes traces; dependencies.py analyzes declared dependency paths and tool_stats.py aggregates tool metrics. Trace files are read only when requested. No provider SDK or network service is involved. A package and UI remain future work; see the roadmap.
 
 ## Limitations
 
