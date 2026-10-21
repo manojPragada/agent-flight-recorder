@@ -10,10 +10,12 @@
 
 - [x] Add validated parent spans and optional relative timestamps
 - [x] Add explicit leaf-dependency critical-path analysis
-- [ ] Build local interactive timeline and failure inspector
+- [x] Build local interactive timeline and failure inspector
 - [ ] Add optional SDK adapters and streaming trace ingestion
 
 ## Continuity
+
+2026-10-21: Added a standalone, responsive offline timeline report with trace metrics, proportional timing bars and a keyboard-accessible failure filter. Output is created exclusively and contains no external assets or requests. Next: optional SDK adapters and streaming ingestion.
 
 2026-10-20: Added per-tool latency percentiles, failure rates and reported-token totals with explicit inclusive-span semantics; rejected aggregate duration overflow. Six regression tests added. Next: interactive timeline/failure inspector; this remains a CLI report, not a dashboard.
 

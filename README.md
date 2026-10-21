@@ -2,7 +2,7 @@
 
 Validate a portable local agent trace and inspect call counts, failures, token totals and tool usage.
 
-**Status:** runnable CLI foundation. No hosted demo or dashboard is available yet. Examples use synthetic offline data. Python 3.10+; standard library only. Validated with Python 3.12.
+**Status:** runnable CLI plus standalone local timeline report. No hosted demo is available. Examples use synthetic offline data. Python 3.10+; standard library only. Validated with Python 3.12.
 
 ## Quick start
 
@@ -21,6 +21,14 @@ Trace format: a JSON object with `version: 1` and `spans`. Each span needs uniqu
 
 Run `python app.py --help` for available options.
 
+## Interactive local timeline
+
+```bash
+python app.py examples/trace.json --html trace-report.html
+```
+
+Open `trace-report.html` in a browser. The standalone report shows summary metrics, proportional timing bars and an interactive failures-only filter. It has no external fonts, scripts, analytics or network requests. Existing output files are not overwritten. Timeline positioning uses `start_ms` when supplied; traces without timestamps place spans at the same origin, so the report does not invent execution order.
+
 ## Hierarchy and timing
 
 Spans may include `parent_id` pointing to another span, or null for a root. Unknown parents and cycles are rejected. `root_span_ids` and `max_depth` summarize the validated hierarchy (roots have depth 1).
@@ -37,7 +45,7 @@ This is a duration-weighted dependency path, not measured wall-clock latency: id
 
 ```bash
 python -m unittest discover -s tests -v
-python -m compileall -q app.py dependencies.py tool_stats.py tests
+python -m compileall -q app.py dependencies.py tool_stats.py viewer.py tests
 ```
 
 Tests exercise trace validation, hierarchy and overlapping/disjoint interval calculations without network access. There is no build step or configured linter; compilation is a syntax check, not linting.
@@ -52,6 +60,7 @@ Configuration is provided through CLI arguments. No environment variables, `.env
 app.py          CLI and trace validation
 tool_stats.py   per-tool latency, failures and reported-token aggregation
 dependencies.py leaf-span dependency analysis
+viewer.py       standalone interactive HTML timeline renderer
 examples/       synthetic example inputs
 tests/          behavioral unit tests
 ROADMAP.md      completed work and prioritized next steps
