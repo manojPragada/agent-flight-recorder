@@ -79,9 +79,15 @@ def summarize(trace):
             'root_span_ids': sorted(roots), 'max_depth': max_depth, 'timing': timing, 'critical_path': dependency_path(spans)}
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('trace');p.add_argument('--html',metavar='OUTPUT',help='Write a standalone local timeline report');a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('trace',help='JSON trace path, NDJSON path, or - for NDJSON stdin');p.add_argument('--ndjson',action='store_true',help='Read one span object per line; implied by trace -');p.add_argument('--html',metavar='OUTPUT',help='Write a standalone local timeline report');a=p.parse_args()
     try:
-        with open(a.trace,encoding='utf-8') as f:trace=json.load(f)
+        if a.ndjson or a.trace=='-':
+            from ingest import read_ndjson
+            if a.trace=='-':trace=read_ndjson(sys.stdin)
+            else:
+                with open(a.trace,encoding='utf-8') as f:trace=read_ndjson(f)
+        else:
+            with open(a.trace,encoding='utf-8') as f:trace=json.load(f)
         summary=summarize(trace)
         if a.html:
             from viewer import render_viewer

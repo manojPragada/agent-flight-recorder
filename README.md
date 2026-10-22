@@ -21,6 +21,15 @@ Trace format: a JSON object with `version: 1` and `spans`. Each span needs uniqu
 
 Run `python app.py --help` for available options.
 
+For append-friendly or piped traces, use provider-neutral NDJSON with one span object per line. Blank lines are ignored, each line is capped at 256 KiB, and a run is capped at 10,000 spans before the normal trace validation runs:
+
+```bash
+python app.py spans.ndjson --ndjson
+cat spans.ndjson | python app.py -
+```
+
+This is finite stream ingestion, not a listening service or an SDK integration. Input is never sent elsewhere.
+
 ## Interactive local timeline
 
 ```bash
@@ -45,7 +54,7 @@ This is a duration-weighted dependency path, not measured wall-clock latency: id
 
 ```bash
 python -m unittest discover -s tests -v
-python -m compileall -q app.py dependencies.py tool_stats.py viewer.py tests
+python -m compileall -q app.py dependencies.py ingest.py tool_stats.py viewer.py tests
 ```
 
 Tests exercise trace validation, hierarchy and overlapping/disjoint interval calculations without network access. There is no build step or configured linter; compilation is a syntax check, not linting.
@@ -60,6 +69,7 @@ Configuration is provided through CLI arguments. No environment variables, `.env
 app.py          CLI and trace validation
 tool_stats.py   per-tool latency, failures and reported-token aggregation
 dependencies.py leaf-span dependency analysis
+ingest.py       bounded provider-neutral NDJSON reader
 viewer.py       standalone interactive HTML timeline renderer
 examples/       synthetic example inputs
 tests/          behavioral unit tests

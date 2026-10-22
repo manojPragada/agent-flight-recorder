@@ -11,9 +11,12 @@
 - [x] Add validated parent spans and optional relative timestamps
 - [x] Add explicit leaf-dependency critical-path analysis
 - [x] Build local interactive timeline and failure inspector
-- [ ] Add optional SDK adapters and streaming trace ingestion
+- [x] Add bounded provider-neutral NDJSON stream ingestion
+- [ ] Add optional SDK adapters
 
 ## Continuity
+
+2026-10-22: Added append-friendly NDJSON file/stdin ingestion with line numbers, 256 KiB event bounds and a 10,000-span cap before normal validation. Next: isolated optional SDK adapters that emit this provider-neutral format.
 
 2026-10-21: Added a standalone, responsive offline timeline report with trace metrics, proportional timing bars and a keyboard-accessible failure filter. Output is created exclusively and contains no external assets or requests. Next: optional SDK adapters and streaming ingestion.
 
