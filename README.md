@@ -30,6 +30,22 @@ cat spans.ndjson | python app.py -
 
 This is finite stream ingestion, not a listening service or an SDK integration. Input is never sent elsewhere.
 
+## Dependency-free instrumentation
+
+`TraceRecorder` provides an optional context manager and decorator for code you control. It records tool names, nested parent IDs, relative timing, status and explicitly supplied token counts in the same provider-neutral format:
+
+```python
+from instrumentation import TraceRecorder
+
+recorder = TraceRecorder()
+with recorder.span("agent", span_id="run-1"):
+    with recorder.span("local-search"):
+        pass
+trace = recorder.trace()
+```
+
+Arguments, return values and exception messages are deliberately not captured. The adapter does not monkey-patch SDKs, send telemetry, infer token counts or write files. Pass its returned trace to the normal validator before persistence.
+
 ## Interactive local timeline
 
 ```bash
@@ -54,7 +70,7 @@ This is a duration-weighted dependency path, not measured wall-clock latency: id
 
 ```bash
 python -m unittest discover -s tests -v
-python -m compileall -q app.py dependencies.py ingest.py tool_stats.py viewer.py tests
+python -m compileall -q app.py dependencies.py ingest.py instrumentation.py tool_stats.py viewer.py tests
 ```
 
 Tests exercise trace validation, hierarchy and overlapping/disjoint interval calculations without network access. There is no build step or configured linter; compilation is a syntax check, not linting.
@@ -70,6 +86,7 @@ app.py          CLI and trace validation
 tool_stats.py   per-tool latency, failures and reported-token aggregation
 dependencies.py leaf-span dependency analysis
 ingest.py       bounded provider-neutral NDJSON reader
+instrumentation.py dependency-free context manager/decorator adapter
 viewer.py       standalone interactive HTML timeline renderer
 examples/       synthetic example inputs
 tests/          behavioral unit tests

@@ -12,9 +12,12 @@
 - [x] Add explicit leaf-dependency critical-path analysis
 - [x] Build local interactive timeline and failure inspector
 - [x] Add bounded provider-neutral NDJSON stream ingestion
-- [ ] Add optional SDK adapters
+- [x] Add dependency-free instrumentation adapter
+- [ ] Add optional vendor SDK adapters
 
 ## Continuity
+
+2026-10-24: Added a dependency-free context-manager/decorator adapter that records nested provider-neutral spans, elapsed timing, declared tokens and failures without capturing arguments, results or exception text. Next: isolated opt-in vendor adapters built on this contract.
 
 2026-10-22: Added append-friendly NDJSON file/stdin ingestion with line numbers, 256 KiB event bounds and a 10,000-span cap before normal validation. Next: isolated optional SDK adapters that emit this provider-neutral format.
 
