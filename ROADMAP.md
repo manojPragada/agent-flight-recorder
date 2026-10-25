@@ -13,9 +13,12 @@
 - [x] Build local interactive timeline and failure inspector
 - [x] Add bounded provider-neutral NDJSON stream ingestion
 - [x] Add dependency-free instrumentation adapter
-- [ ] Add optional vendor SDK adapters
+- [x] Add an opt-in synchronous OpenAI Responses adapter
+- [ ] Add another provider adapter only when its stable usage contract can be tested
 
 ## Continuity
+
+2026-10-25: Added an optional duck-typed OpenAI Responses adapter that records timing and documented input/output token totals without importing the SDK or retaining request/response content. Streaming is unsupported. Next: another isolated provider adapter only when its usage contract can be tested.
 
 2026-10-24: Added a dependency-free context-manager/decorator adapter that records nested provider-neutral spans, elapsed timing, declared tokens and failures without capturing arguments, results or exception text. Next: isolated opt-in vendor adapters built on this contract.
 

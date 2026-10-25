@@ -25,6 +25,12 @@ class TraceRecorder:
     def trace(self):
         return {'version':1,'spans':list(self.spans)}
 
+    def set_tokens(self, span_id, tokens):
+        if type(tokens) is not int or tokens<0:raise ValueError('tokens must be a non-negative integer')
+        for span in reversed(self.spans):
+            if span['id']==span_id:span['tokens']=tokens;return
+        raise ValueError('span_id has not completed')
+
     def instrument(self, tool, *, tokens=0):
         def decorate(function):
             def wrapped(*args,**kwargs):

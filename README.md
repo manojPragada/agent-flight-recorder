@@ -46,6 +46,16 @@ trace = recorder.trace()
 
 Arguments, return values and exception messages are deliberately not captured. The adapter does not monkey-patch SDKs, send telemetry, infer token counts or write files. Pass its returned trace to the normal validator before persistence.
 
+### Optional OpenAI Responses adapter
+
+`openai_adapter.record_response_call` wraps a synchronous `client.responses.create`-compatible callable. It records elapsed time and the completed response's documented `usage.input_tokens + usage.output_tokens`; prompts, arguments, output text, IDs and exception messages are never copied into the trace. The OpenAI package is optional and is not imported by this project:
+
+```python
+response = record_response_call(recorder, client.responses.create, model="...", input="...")
+```
+
+Streaming responses are intentionally unsupported because usage is not available until completion. Treat reported tokens as provider metadata, not a billing calculation.
+
 ## Interactive local timeline
 
 ```bash
@@ -87,6 +97,7 @@ tool_stats.py   per-tool latency, failures and reported-token aggregation
 dependencies.py leaf-span dependency analysis
 ingest.py       bounded provider-neutral NDJSON reader
 instrumentation.py dependency-free context manager/decorator adapter
+openai_adapter.py opt-in synchronous Responses API timing/usage adapter
 viewer.py       standalone interactive HTML timeline renderer
 examples/       synthetic example inputs
 tests/          behavioral unit tests

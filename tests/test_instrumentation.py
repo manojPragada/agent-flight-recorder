@@ -1,6 +1,7 @@
 import unittest
 from instrumentation import TraceRecorder
 from app import summarize
+from openai_adapter import record_response_call,response_tokens
 
 class Clock:
     def __init__(self):self.value=10
@@ -26,3 +27,11 @@ class InstrumentationTests(unittest.TestCase):
             with recorder.span('',span_id='x'):pass
         with self.assertRaises(ValueError):
             with recorder.span('tool',tokens=-1):pass
+    def test_openai_adapter_records_only_timing_and_reported_tokens(self):
+        recorder=TraceRecorder(Clock());secret='do-not-record'
+        response=record_response_call(recorder,lambda **kwargs:{'usage':{'input_tokens':7,'output_tokens':3},'output_text':secret},input=secret)
+        self.assertEqual(response['output_text'],secret);self.assertEqual(recorder.spans[0]['tokens'],10)
+        self.assertNotIn(secret,repr(recorder.trace()))
+    def test_openai_usage_must_be_complete_and_non_negative(self):
+        self.assertEqual(response_tokens({}),0)
+        with self.assertRaises(ValueError):response_tokens({'usage':{'input_tokens':1,'output_tokens':None}})
