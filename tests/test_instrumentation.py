@@ -2,6 +2,7 @@ import unittest
 from instrumentation import TraceRecorder
 from app import summarize
 from openai_adapter import record_response_call,response_tokens
+from anthropic_adapter import record_message_call,message_tokens
 
 class Clock:
     def __init__(self):self.value=10
@@ -35,3 +36,10 @@ class InstrumentationTests(unittest.TestCase):
     def test_openai_usage_must_be_complete_and_non_negative(self):
         self.assertEqual(response_tokens({}),0)
         with self.assertRaises(ValueError):response_tokens({'usage':{'input_tokens':1,'output_tokens':None}})
+    def test_anthropic_adapter_includes_cache_usage_without_content(self):
+        recorder=TraceRecorder(Clock());secret='private prompt'
+        message=record_message_call(recorder,lambda **kwargs:{'usage':{'input_tokens':4,'cache_creation_input_tokens':2,'cache_read_input_tokens':3,'output_tokens':1},'content':secret},messages=[secret])
+        self.assertEqual(message['content'],secret);self.assertEqual(recorder.spans[0]['tokens'],10);self.assertNotIn(secret,repr(recorder.trace()))
+    def test_anthropic_usage_rejects_invalid_counts(self):
+        self.assertEqual(message_tokens({}),0)
+        with self.assertRaises(ValueError):message_tokens({'usage':{'input_tokens':-1,'output_tokens':2}})

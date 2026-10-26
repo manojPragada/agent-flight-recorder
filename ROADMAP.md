@@ -14,9 +14,12 @@
 - [x] Add bounded provider-neutral NDJSON stream ingestion
 - [x] Add dependency-free instrumentation adapter
 - [x] Add an opt-in synchronous OpenAI Responses adapter
-- [ ] Add another provider adapter only when its stable usage contract can be tested
+- [x] Add an opt-in synchronous Anthropic Messages adapter
+- [ ] Add streaming adapters only with completion-safe usage accounting
 
 ## Continuity
+
+2026-10-26: Added an optional duck-typed Anthropic Messages adapter using the documented input, cache-creation, cache-read and output token fields without importing the SDK or retaining content. Next: streaming adapters only with completion-safe usage accounting.
 
 2026-10-25: Added an optional duck-typed OpenAI Responses adapter that records timing and documented input/output token totals without importing the SDK or retaining request/response content. Streaming is unsupported. Next: another isolated provider adapter only when its usage contract can be tested.
 

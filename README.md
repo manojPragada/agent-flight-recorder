@@ -56,6 +56,8 @@ response = record_response_call(recorder, client.responses.create, model="...", 
 
 Streaming responses are intentionally unsupported because usage is not available until completion. Treat reported tokens as provider metadata, not a billing calculation.
 
+`anthropic_adapter.record_message_call` provides the same synchronous, content-free boundary for `client.messages.create`. Its reported total includes documented input, cache-creation, cache-read and output token fields. The Anthropic package remains optional and is never imported by this project. This total is trace metadata, not a price calculation.
+
 ## Interactive local timeline
 
 ```bash
@@ -98,6 +100,7 @@ dependencies.py leaf-span dependency analysis
 ingest.py       bounded provider-neutral NDJSON reader
 instrumentation.py dependency-free context manager/decorator adapter
 openai_adapter.py opt-in synchronous Responses API timing/usage adapter
+anthropic_adapter.py opt-in synchronous Anthropic Messages timing/usage adapter
 viewer.py       standalone interactive HTML timeline renderer
 examples/       synthetic example inputs
 tests/          behavioral unit tests
