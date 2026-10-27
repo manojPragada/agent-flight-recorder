@@ -17,6 +17,8 @@ Use `python3` if your system does not provide `python`. No package installation 
 
 ## Usage and behavior
 
+`streaming_adapter.record_completed_stream` yields provider-neutral events unchanged and records usage only from an explicit completed final event. Interrupted streams make no token claim; vendor-specific event mapping remains intentionally unimplemented.
+
 Trace format: a JSON object with `version: 1` and `spans`. Each span needs unique string `id`, string `tool`, non-negative finite `duration_ms`, `status` (`ok` or `error`), and optional non-negative integer `tokens`.
 
 Run `python app.py --help` for available options.

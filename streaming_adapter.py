@@ -1,0 +1,17 @@
+"""Provider-neutral completion-gated token accounting for streaming adapters."""
+def _value(value,name):return value.get(name) if isinstance(value,dict) else getattr(value,name,None)
+def completed_stream_tokens(event):
+    """Return tokens only for an explicitly completed final event."""
+    if _value(event,'type') not in {'response.completed','message_stop'}:return None
+    usage=_value(event,'usage')
+    if usage is None:return None
+    values=(_value(usage,'input_tokens'),_value(usage,'output_tokens'))
+    if any(type(value) is not int or value<0 for value in values):raise ValueError('Completed stream usage must contain non-negative input_tokens and output_tokens')
+    return sum(values)
+def record_completed_stream(recorder,events,*,tool='provider.stream'):
+    """Yield events unchanged and commit usage only after normal completion."""
+    with recorder.span(tool) as span_id:
+        for event in events:
+            tokens=completed_stream_tokens(event)
+            if tokens is not None:recorder.set_tokens(span_id,tokens)
+            yield event
