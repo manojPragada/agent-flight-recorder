@@ -20,6 +20,8 @@
 
 ## Continuity
 
+2026-10-28: Hardened completion-safe stream accounting by rejecting duplicate completion events instead of overwriting token totals. Next: bind the contract to one verified vendor event shape.
+
 2026-10-27: Added a provider-neutral stream wrapper that yields events unchanged and records tokens only from an explicit completed final event. Partial/interrupted streams make no token claim. Next: bind this contract to one verified vendor stream event shape.
 
 2026-10-26: Added an optional duck-typed Anthropic Messages adapter using the documented input, cache-creation, cache-read and output token fields without importing the SDK or retaining content. Next: streaming adapters only with completion-safe usage accounting.

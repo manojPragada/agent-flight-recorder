@@ -10,8 +10,11 @@ def completed_stream_tokens(event):
     return sum(values)
 def record_completed_stream(recorder,events,*,tool='provider.stream'):
     """Yield events unchanged and commit usage only after normal completion."""
+    completed=False
     with recorder.span(tool) as span_id:
         for event in events:
             tokens=completed_stream_tokens(event)
-            if tokens is not None:recorder.set_tokens(span_id,tokens)
+            if tokens is not None:
+                if completed:raise ValueError('Stream contains multiple completed usage events')
+                completed=True;recorder.set_tokens(span_id,tokens)
             yield event
