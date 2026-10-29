@@ -15,10 +15,12 @@
 - [x] Add dependency-free instrumentation adapter
 - [x] Add an opt-in synchronous OpenAI Responses adapter
 - [x] Add an opt-in synchronous Anthropic Messages adapter
-- [ ] Add streaming adapters only with completion-safe usage accounting
+- [x] Add streaming adapters only with completion-safe usage accounting
 - [x] Define provider-neutral completion-safe streaming usage accounting
 
 ## Continuity
+
+2026-10-29: Bound completion-safe accounting to the OpenAI Responses `response.completed.response.usage` event shape. Deltas pass through but are never retained, and partial streams make no usage claim. Next: add another vendor only after verifying its final event contract.
 
 2026-10-28: Hardened completion-safe stream accounting by rejecting duplicate completion events instead of overwriting token totals. Next: bind the contract to one verified vendor event shape.
 

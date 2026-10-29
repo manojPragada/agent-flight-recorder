@@ -1,5 +1,6 @@
 import unittest
-from streaming_adapter import completed_stream_tokens,record_completed_stream
+from streaming_adapter import completed_stream_tokens,record_completed_stream,record_openai_response_stream
+from instrumentation import TraceRecorder
 class Recorder:
  def __init__(self):self.tokens=[]
  class Span:
@@ -16,3 +17,10 @@ class StreamingTests(unittest.TestCase):
  def test_multiple_completion_events_are_rejected(self):
   event={'type':'response.completed','usage':{'input_tokens':1,'output_tokens':1}}
   with self.assertRaisesRegex(ValueError,'multiple'):list(record_completed_stream(Recorder(),[event,event]))
+ def test_openai_completed_event_reads_nested_response_usage(self):
+  recorder=Recorder();events=[{'type':'response.output_text.delta','delta':'secret'},{'type':'response.completed','response':{'usage':{'input_tokens':2,'output_tokens':5},'output':'not retained'}}]
+  self.assertEqual(list(record_openai_response_stream(recorder,events)),events);self.assertEqual(recorder.tokens,[('span',7)])
+ def test_openai_partial_stream_makes_no_usage_claim(self):
+  recorder=Recorder();list(record_openai_response_stream(recorder,[{'type':'response.output_text.delta','delta':'secret'}]));self.assertEqual(recorder.tokens,[])
+ def test_real_recorder_commits_after_span_completion(self):
+  recorder=TraceRecorder();list(record_openai_response_stream(recorder,[{'type':'response.completed','response':{'usage':{'input_tokens':1,'output_tokens':2}}}]));self.assertEqual(recorder.spans[0]['tokens'],3)
