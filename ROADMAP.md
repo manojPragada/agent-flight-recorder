@@ -20,6 +20,8 @@
 
 ## Continuity
 
+2026-10-30: Enforced terminal completion events for provider-neutral and OpenAI Responses streams. Trailing events now fail the span instead of permitting an ambiguous token-accounting boundary. Next: add another vendor only after verifying its final event contract.
+
 2026-10-29: Bound completion-safe accounting to the OpenAI Responses `response.completed.response.usage` event shape. Deltas pass through but are never retained, and partial streams make no usage claim. Next: add another vendor only after verifying its final event contract.
 
 2026-10-28: Hardened completion-safe stream accounting by rejecting duplicate completion events instead of overwriting token totals. Next: bind the contract to one verified vendor event shape.

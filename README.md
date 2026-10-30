@@ -17,7 +17,7 @@ Use `python3` if your system does not provide `python`. No package installation 
 
 ## Usage and behavior
 
-`streaming_adapter.record_completed_stream` yields provider-neutral events unchanged and records usage only after an explicit final event and span completion. `record_openai_response_stream` maps the Responses API `response.completed.response.usage` shape; deltas pass through without retention and interrupted streams make no token claim.
+`streaming_adapter.record_completed_stream` yields provider-neutral events unchanged and records usage only after an explicit terminal event and span completion. Events after completion are rejected rather than silently accepting an ambiguous usage boundary. `record_openai_response_stream` maps the Responses API `response.completed.response.usage` shape; deltas pass through without retention and interrupted streams make no token claim.
 
 Trace format: a JSON object with `version: 1` and `spans`. Each span needs unique string `id`, string `tool`, non-negative finite `duration_ms`, `status` (`ok` or `error`), and optional non-negative integer `tokens`.
 

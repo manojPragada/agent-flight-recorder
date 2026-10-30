@@ -24,6 +24,9 @@ def record_openai_response_stream(recorder,events,*,tool='openai.responses.strea
     with recorder.span(tool) as span_id:
         for event in events:
             tokens=openai_completed_event_tokens(event)
+            if completed:
+                if tokens is not None:raise ValueError('Stream contains multiple response.completed events')
+                raise ValueError('Stream contains an event after response.completed')
             if tokens is not None:
                 if completed:raise ValueError('Stream contains multiple response.completed events')
                 completed=True;final_tokens=tokens
@@ -35,6 +38,9 @@ def record_completed_stream(recorder,events,*,tool='provider.stream'):
     with recorder.span(tool) as span_id:
         for event in events:
             tokens=completed_stream_tokens(event)
+            if completed:
+                if tokens is not None:raise ValueError('Stream contains multiple completed usage events')
+                raise ValueError('Stream contains an event after completion')
             if tokens is not None:
                 if completed:raise ValueError('Stream contains multiple completed usage events')
                 completed=True;final_tokens=tokens
