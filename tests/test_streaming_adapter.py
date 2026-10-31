@@ -30,3 +30,6 @@ class StreamingTests(unittest.TestCase):
  def test_openai_completion_must_be_terminal(self):
   event={'type':'response.completed','response':{'usage':{'input_tokens':1,'output_tokens':2}}}
   with self.assertRaisesRegex(ValueError,'after response.completed'):list(record_openai_response_stream(Recorder(),[event,{'type':'response.output_text.delta'}]))
+ def test_completed_usage_rejects_non_json_safe_totals(self):
+  with self.assertRaisesRegex(ValueError,'JSON-safe'):completed_stream_tokens({'type':'message_stop','usage':{'input_tokens':9_007_199_254_740_991,'output_tokens':1}})
+  with self.assertRaisesRegex(ValueError,'bounded'):completed_stream_tokens({'type':'message_stop','usage':{'input_tokens':9_007_199_254_740_992,'output_tokens':0}})
