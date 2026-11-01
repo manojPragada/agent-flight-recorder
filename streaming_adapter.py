@@ -6,6 +6,8 @@ def _usage_total(usage,label):
     if any(type(value) is not int or value<0 or value>MAX_SAFE_TOKENS for value in values):raise ValueError(label+' usage must contain bounded non-negative input_tokens and output_tokens')
     total=sum(values)
     if total>MAX_SAFE_TOKENS:raise ValueError(label+' token total exceeds the JSON-safe integer range')
+    reported=_value(usage,'total_tokens')
+    if reported is not None and (type(reported) is not int or reported<0 or reported>MAX_SAFE_TOKENS or reported!=total):raise ValueError(label+' total_tokens must equal input_tokens plus output_tokens')
     return total
 def completed_stream_tokens(event):
     """Return tokens only for an explicitly completed final event."""

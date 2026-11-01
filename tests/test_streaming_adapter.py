@@ -33,3 +33,6 @@ class StreamingTests(unittest.TestCase):
  def test_completed_usage_rejects_non_json_safe_totals(self):
   with self.assertRaisesRegex(ValueError,'JSON-safe'):completed_stream_tokens({'type':'message_stop','usage':{'input_tokens':9_007_199_254_740_991,'output_tokens':1}})
   with self.assertRaisesRegex(ValueError,'bounded'):completed_stream_tokens({'type':'message_stop','usage':{'input_tokens':9_007_199_254_740_992,'output_tokens':0}})
+ def test_reported_total_must_match_components(self):
+  self.assertEqual(completed_stream_tokens({'type':'message_stop','usage':{'input_tokens':2,'output_tokens':3,'total_tokens':5}}),5)
+  with self.assertRaisesRegex(ValueError,'must equal'):completed_stream_tokens({'type':'message_stop','usage':{'input_tokens':2,'output_tokens':3,'total_tokens':6}})

@@ -20,6 +20,8 @@
 
 ## Continuity
 
+2026-11-01: Validated optional completion-event `total_tokens` against bounded input-plus-output counts before recording usage. Missing totals remain supported; inconsistent provider metadata now fails without a usage claim. Next: add another vendor only after verifying its final event contract.
+
 2026-10-31: Bounded completion-event input/output counts and their total to JSON-safe non-negative integers, preventing malformed provider metadata from producing lossy trace values. Next: add another vendor only after verifying its final event contract.
 
 2026-10-30: Enforced terminal completion events for provider-neutral and OpenAI Responses streams. Trailing events now fail the span instead of permitting an ambiguous token-accounting boundary. Next: add another vendor only after verifying its final event contract.
