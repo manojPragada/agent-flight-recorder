@@ -20,6 +20,8 @@
 
 ## Continuity
 
+2026-11-02: Required usage on provider-neutral terminal stream events. Partial streams still make no accounting claim, while malformed completed streams now fail instead of looking successfully unmetered. Next: add another vendor only after verifying its final event contract.
+
 2026-11-01: Validated optional completion-event `total_tokens` against bounded input-plus-output counts before recording usage. Missing totals remain supported; inconsistent provider metadata now fails without a usage claim. Next: add another vendor only after verifying its final event contract.
 
 2026-10-31: Bounded completion-event input/output counts and their total to JSON-safe non-negative integers, preventing malformed provider metadata from producing lossy trace values. Next: add another vendor only after verifying its final event contract.

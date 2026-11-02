@@ -13,7 +13,7 @@ def completed_stream_tokens(event):
     """Return tokens only for an explicitly completed final event."""
     if _value(event,'type') not in {'response.completed','message_stop'}:return None
     usage=_value(event,'usage')
-    if usage is None:return None
+    if usage is None:raise ValueError('Completed stream event requires usage')
     return _usage_total(usage,'Completed stream')
 def openai_completed_event_tokens(event):
     """Read usage only from the response object on a Responses API completed event."""
