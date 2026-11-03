@@ -17,7 +17,7 @@ Use `python3` if your system does not provide `python`. No package installation 
 
 ## Usage and behavior
 
-`streaming_adapter.record_completed_stream` yields provider-neutral events unchanged and records usage only after an explicit terminal event and span completion. A terminal event must include usage; events after completion and terminal events without accounting are rejected rather than silently accepting an ambiguous usage boundary. Input/output counts and their total must remain within JavaScript's JSON-safe integer range; an optional reported `total_tokens` must equal their sum. `record_openai_response_stream` maps the Responses API `response.completed.response.usage` shape; deltas pass through without retention and interrupted or inconsistent streams make no token claim.
+`streaming_adapter.record_completed_stream` yields typed provider-neutral events unchanged and records usage only after an explicit terminal event and span completion. Every event requires a non-empty string type. A terminal event must include usage; events after completion and terminal events without accounting are rejected rather than silently accepting an ambiguous usage boundary. Input/output counts and their total must remain within JavaScript's JSON-safe integer range; an optional reported `total_tokens` must equal their sum. `record_openai_response_stream` maps the Responses API `response.completed.response.usage` shape; deltas pass through without retention and interrupted or inconsistent streams make no token claim.
 
 Trace format: a JSON object with `version: 1` and `spans`. Each span needs unique string `id`, string `tool`, non-negative finite `duration_ms`, `status` (`ok` or `error`), and optional non-negative integer `tokens`.
 

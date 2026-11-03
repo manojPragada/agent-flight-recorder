@@ -1,6 +1,10 @@
 """Provider-neutral completion-gated token accounting for streaming adapters."""
 MAX_SAFE_TOKENS=9_007_199_254_740_991
 def _value(value,name):return value.get(name) if isinstance(value,dict) else getattr(value,name,None)
+def _event_type(event):
+    value=_value(event,'type')
+    if not isinstance(value,str) or not value:raise ValueError('Stream events require a non-empty string type')
+    return value
 def _usage_total(usage,label):
     values=(_value(usage,'input_tokens'),_value(usage,'output_tokens'))
     if any(type(value) is not int or value<0 or value>MAX_SAFE_TOKENS for value in values):raise ValueError(label+' usage must contain bounded non-negative input_tokens and output_tokens')
@@ -11,13 +15,13 @@ def _usage_total(usage,label):
     return total
 def completed_stream_tokens(event):
     """Return tokens only for an explicitly completed final event."""
-    if _value(event,'type') not in {'response.completed','message_stop'}:return None
+    if _event_type(event) not in {'response.completed','message_stop'}:return None
     usage=_value(event,'usage')
     if usage is None:raise ValueError('Completed stream event requires usage')
     return _usage_total(usage,'Completed stream')
 def openai_completed_event_tokens(event):
     """Read usage only from the response object on a Responses API completed event."""
-    if _value(event,'type')!='response.completed':return None
+    if _event_type(event)!='response.completed':return None
     response=_value(event,'response')
     if response is None:raise ValueError('OpenAI response.completed event requires a response object')
     usage=_value(response,'usage')

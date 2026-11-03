@@ -14,6 +14,9 @@ class StreamingTests(unittest.TestCase):
   self.assertEqual(list(record_completed_stream(recorder,events)),events);self.assertEqual(recorder.tokens,[('span',7)])
  def test_partial_stream_has_no_usage_claim(self):
   recorder=Recorder();list(record_completed_stream(recorder,[{'type':'delta'}]));self.assertEqual(recorder.tokens,[])
+ def test_stream_events_require_a_type_before_yielding(self):
+  for adapter in (record_completed_stream,record_openai_response_stream):
+   with self.assertRaisesRegex(ValueError,'non-empty string type'):list(adapter(Recorder(),[{'delta':'secret'}]))
  def test_terminal_event_requires_usage(self):
   with self.assertRaisesRegex(ValueError,'requires usage'):list(record_completed_stream(Recorder(),[{'type':'message_stop'}]))
  def test_multiple_completion_events_are_rejected(self):
