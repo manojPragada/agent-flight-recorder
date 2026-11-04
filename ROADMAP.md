@@ -20,6 +20,8 @@
 
 ## Continuity
 
+2026-11-04: Bounded stream event types to 128 printable non-whitespace-delimited ASCII characters, rejecting control characters and oversized malformed envelopes before yielding. Next: add another vendor only after verifying its final event contract.
+
 2026-11-03: Rejected provider-neutral and OpenAI stream events without a non-empty string type before yielding them, preventing malformed envelopes from looking like valid partial streams. Next: add another vendor only after verifying its final event contract.
 
 2026-11-02: Required usage on provider-neutral terminal stream events. Partial streams still make no accounting claim, while malformed completed streams now fail instead of looking successfully unmetered. Next: add another vendor only after verifying its final event contract.
