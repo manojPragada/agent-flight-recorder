@@ -16,9 +16,9 @@ class StreamingTests(unittest.TestCase):
   recorder=Recorder();list(record_completed_stream(recorder,[{'type':'delta'}]));self.assertEqual(recorder.tokens,[])
  def test_stream_events_require_a_type_before_yielding(self):
   for adapter in (record_completed_stream,record_openai_response_stream):
-   with self.assertRaisesRegex(ValueError,'bounded printable string type'):list(adapter(Recorder(),[{'delta':'secret'}]))
-   for value in (' response.delta','response.\ndelta','x'*129):
-    with self.assertRaisesRegex(ValueError,'bounded printable string type'):list(adapter(Recorder(),[{'type':value}]))
+   with self.assertRaisesRegex(ValueError,'bounded identifier-like string type'):list(adapter(Recorder(),[{'delta':'secret'}]))
+   for value in (' response.delta','response.\ndelta','response..delta','response/delta','x'*129):
+    with self.assertRaisesRegex(ValueError,'bounded identifier-like string type'):list(adapter(Recorder(),[{'type':value}]))
  def test_terminal_event_requires_usage(self):
   with self.assertRaisesRegex(ValueError,'requires usage'):list(record_completed_stream(Recorder(),[{'type':'message_stop'}]))
  def test_multiple_completion_events_are_rejected(self):

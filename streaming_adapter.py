@@ -1,9 +1,10 @@
 """Provider-neutral completion-gated token accounting for streaming adapters."""
+import re
 MAX_SAFE_TOKENS=9_007_199_254_740_991
 def _value(value,name):return value.get(name) if isinstance(value,dict) else getattr(value,name,None)
 def _event_type(event):
     value=_value(event,'type')
-    if not isinstance(value,str) or not value or value.strip()!=value or len(value)>128 or any(ord(char)<33 or ord(char)>126 for char in value):raise ValueError('Stream events require a bounded printable string type')
+    if not isinstance(value,str) or len(value)>128 or re.fullmatch(r'[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*',value) is None:raise ValueError('Stream events require a bounded identifier-like string type')
     return value
 def _usage_total(usage,label):
     values=(_value(usage,'input_tokens'),_value(usage,'output_tokens'))
