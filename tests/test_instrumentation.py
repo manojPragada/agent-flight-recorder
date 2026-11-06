@@ -43,3 +43,10 @@ class InstrumentationTests(unittest.TestCase):
     def test_anthropic_usage_rejects_invalid_counts(self):
         self.assertEqual(message_tokens({}),0)
         with self.assertRaises(ValueError):message_tokens({'usage':{'input_tokens':-1,'output_tokens':2}})
+    def test_synchronous_usage_stays_json_safe(self):
+        maximum=9_007_199_254_740_991
+        with self.assertRaisesRegex(ValueError,'JSON-safe'):response_tokens({'usage':{'input_tokens':maximum,'output_tokens':1}})
+        with self.assertRaisesRegex(ValueError,'JSON-safe'):message_tokens({'usage':{'input_tokens':maximum,'output_tokens':1}})
+        recorder=TraceRecorder(Clock())
+        with self.assertRaisesRegex(ValueError,'JSON-safe'):
+            with recorder.span('tool',tokens=maximum+1):pass

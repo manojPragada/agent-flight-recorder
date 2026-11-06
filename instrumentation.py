@@ -2,6 +2,11 @@
 import contextlib
 import time
 import uuid
+MAX_SAFE_TOKENS=9_007_199_254_740_991
+
+def _tokens(value):
+    if type(value) is not int or not 0<=value<=MAX_SAFE_TOKENS:raise ValueError('tokens must be a JSON-safe non-negative integer')
+    return value
 
 class TraceRecorder:
     def __init__(self, clock=time.perf_counter):
@@ -10,7 +15,7 @@ class TraceRecorder:
     @contextlib.contextmanager
     def span(self, tool, *, span_id=None, tokens=0):
         if not isinstance(tool,str) or not tool or len(tool)>200:raise ValueError('tool must be 1–200 characters')
-        if type(tokens) is not int or tokens<0:raise ValueError('tokens must be a non-negative integer')
+        _tokens(tokens)
         identifier=span_id or uuid.uuid4().hex
         if not isinstance(identifier,str) or not identifier or len(identifier)>200 or any(s['id']==identifier for s in self.spans):
             raise ValueError('span_id must be a unique 1–200 character string')
@@ -26,7 +31,7 @@ class TraceRecorder:
         return {'version':1,'spans':list(self.spans)}
 
     def set_tokens(self, span_id, tokens):
-        if type(tokens) is not int or tokens<0:raise ValueError('tokens must be a non-negative integer')
+        _tokens(tokens)
         for span in reversed(self.spans):
             if span['id']==span_id:span['tokens']=tokens;return
         raise ValueError('span_id has not completed')

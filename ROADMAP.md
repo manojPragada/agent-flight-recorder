@@ -20,6 +20,8 @@
 
 ## Continuity
 
+2026-11-06: Applied the streaming path's JSON-safe token bound to synchronous OpenAI/Anthropic usage and direct recorder metadata, preventing oversized counts from entering trace files. Next: add another vendor only after verifying its completion contract.
+
 2026-11-05: Restricted stream event types to bounded identifier-like ASCII segments, rejecting empty segments and path-like punctuation before malformed envelopes are yielded. Next: add another vendor only after verifying its final event contract.
 
 2026-11-04: Bounded stream event types to 128 printable non-whitespace-delimited ASCII characters, rejecting control characters and oversized malformed envelopes before yielding. Next: add another vendor only after verifying its final event contract.
