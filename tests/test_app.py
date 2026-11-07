@@ -11,6 +11,11 @@ class Tests(unittest.TestCase):
         for value in [-1,True,float('nan'),float('inf')]:
             t=self.trace();t['spans'][0]['duration_ms']=value
             with self.assertRaises(ValueError):summarize(t)
+    def test_imported_tokens_and_aggregate_stay_json_safe(self):
+        maximum=9_007_199_254_740_991;t=self.trace();t['spans'][0]['tokens']=maximum+1
+        with self.assertRaisesRegex(ValueError,'JSON-safe'):summarize(t)
+        t['spans'][0]['tokens']=maximum;t['spans'].append({'id':'b','tool':'model','duration_ms':1,'tokens':1,'status':'ok'})
+        with self.assertRaisesRegex(ValueError,'Aggregated tokens'):summarize(t)
     def test_empty(self):self.assertEqual(summarize({'version':1,'spans':[]})['span_count'],0)
 
 

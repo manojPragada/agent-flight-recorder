@@ -6,6 +6,7 @@ import sys
 from collections import Counter
 from dependencies import dependency_path
 from tool_stats import tool_statistics
+MAX_SAFE_TOKENS=9_007_199_254_740_991
 
 def summarize(trace):
     if not isinstance(trace,dict) or type(trace.get('version')) is not int or trace.get('version') != 1 or not isinstance(trace.get('spans'),list):
@@ -19,9 +20,10 @@ def summarize(trace):
         ids.add(identifier)
         ms=span.get('duration_ms');count=span.get('tokens',0)
         if type(ms) not in (int,float) or not math.isfinite(ms) or ms<0:raise ValueError('duration_ms must be finite and non-negative')
-        if type(count) is not int or count<0:raise ValueError('tokens must be a non-negative integer')
+        if type(count) is not int or not 0<=count<=MAX_SAFE_TOKENS:raise ValueError('tokens must be a JSON-safe non-negative integer')
         if span.get('status') not in ('ok','error'):raise ValueError('status must be ok or error')
         tools[tool]+=1;duration+=ms;tokens+=count;failures+=span['status']=='error'
+        if tokens>MAX_SAFE_TOKENS:raise ValueError('Aggregated tokens must remain a JSON-safe integer')
     spans = {span['id']: span for span in trace['spans']}
     roots = []
     max_depth = 0
