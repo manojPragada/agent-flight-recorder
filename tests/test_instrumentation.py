@@ -28,6 +28,9 @@ class InstrumentationTests(unittest.TestCase):
             with recorder.span('',span_id='x'):pass
         with self.assertRaises(ValueError):
             with recorder.span('tool',tokens=-1):pass
+        for tool,span_id in [('bad\ntool','x'),('tool','bad\x7fid')]:
+            with self.assertRaisesRegex(ValueError,'control-free'):
+                with recorder.span(tool,span_id=span_id):pass
     def test_openai_adapter_records_only_timing_and_reported_tokens(self):
         recorder=TraceRecorder(Clock());secret='do-not-record'
         response=record_response_call(recorder,lambda **kwargs:{'usage':{'input_tokens':7,'output_tokens':3},'output_text':secret},input=secret)

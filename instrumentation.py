@@ -4,6 +4,10 @@ import time
 import uuid
 MAX_SAFE_TOKENS=9_007_199_254_740_991
 
+def _label(value,name):
+    if not isinstance(value,str) or not value or len(value)>200 or any(ord(character)<32 or ord(character)==127 for character in value):raise ValueError(f'{name} must be a control-free 1–200 character string')
+    return value
+
 def _tokens(value):
     if type(value) is not int or not 0<=value<=MAX_SAFE_TOKENS:raise ValueError('tokens must be a JSON-safe non-negative integer')
     return value
@@ -14,11 +18,11 @@ class TraceRecorder:
 
     @contextlib.contextmanager
     def span(self, tool, *, span_id=None, tokens=0):
-        if not isinstance(tool,str) or not tool or len(tool)>200:raise ValueError('tool must be 1–200 characters')
+        _label(tool,'tool')
         _tokens(tokens)
         identifier=span_id or uuid.uuid4().hex
-        if not isinstance(identifier,str) or not identifier or len(identifier)>200 or any(s['id']==identifier for s in self.spans):
-            raise ValueError('span_id must be a unique 1–200 character string')
+        _label(identifier,'span_id')
+        if any(s['id']==identifier for s in self.spans):raise ValueError('span_id must be unique')
         start=self.clock();parent=self._stack[-1] if self._stack else None;self._stack.append(identifier);status='ok'
         try:yield identifier
         except BaseException:

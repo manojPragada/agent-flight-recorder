@@ -7,6 +7,10 @@ class Tests(unittest.TestCase):
     def test_duplicates(self):
         t=self.trace();t['spans']*=2
         with self.assertRaises(ValueError):summarize(t)
+    def test_imported_span_labels_are_bounded_and_control_free(self):
+        for field,value in [('id','x'*201),('id','bad\nspan'),('tool','x'*201),('tool','bad\x7ftool')]:
+            t=self.trace();t['spans'][0][field]=value
+            with self.assertRaisesRegex(ValueError,'control-free'):summarize(t)
     def test_invalid_numbers(self):
         for value in [-1,True,float('nan'),float('inf')]:
             t=self.trace();t['spans'][0]['duration_ms']=value

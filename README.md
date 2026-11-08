@@ -21,7 +21,7 @@ Stream event types are limited to 128 identifier-like ASCII characters, using al
 
 `streaming_adapter.record_completed_stream` yields typed provider-neutral events unchanged and records usage only after an explicit terminal event and span completion. Every event requires a non-empty string type. A terminal event must include usage; events after completion and terminal events without accounting are rejected rather than silently accepting an ambiguous usage boundary. Input/output counts and their total must remain within JavaScript's JSON-safe integer range; an optional reported `total_tokens` must equal their sum. The synchronous OpenAI and Anthropic adapters and direct recorder metadata enforce the same upper bound. `record_openai_response_stream` maps the Responses API `response.completed.response.usage` shape; deltas pass through without retention and interrupted or inconsistent streams make no token claim.
 
-Trace format: a JSON object with `version: 1` and `spans`. Each span needs unique string `id`, string `tool`, non-negative finite `duration_ms`, `status` (`ok` or `error`), and optional non-negative JSON-safe integer `tokens`. Imported per-span counts and their aggregate are bounded before summaries or reports are produced.
+Trace format: a JSON object with `version: 1` and `spans`. Each span needs a unique, control-free 1–200 character string `id`, a control-free 1–200 character string `tool`, non-negative finite `duration_ms`, `status` (`ok` or `error`), and optional non-negative JSON-safe integer `tokens`. Imported and directly recorded labels follow the same bounds. Imported per-span token counts and their aggregate are bounded before summaries or reports are produced.
 
 Run `python app.py --help` for available options.
 

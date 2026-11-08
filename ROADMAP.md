@@ -20,6 +20,8 @@
 
 ## Continuity
 
+2026-11-08: Aligned imported and directly recorded span IDs/tool labels on a control-free 1–200 character contract, preventing oversized or terminal-shaping metadata from entering summaries and reports. Next: add another vendor only after verifying its completion contract.
+
 2026-11-07: Applied the existing JSON-safe token bound to imported trace spans and their aggregate, preventing externally authored files from producing lossy summary counts. Next: add another vendor only after verifying its completion contract.
 
 2026-11-06: Applied the streaming path's JSON-safe token bound to synchronous OpenAI/Anthropic usage and direct recorder metadata, preventing oversized counts from entering trace files. Next: add another vendor only after verifying its completion contract.

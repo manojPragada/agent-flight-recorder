@@ -8,15 +8,19 @@ from dependencies import dependency_path
 from tool_stats import tool_statistics
 MAX_SAFE_TOKENS=9_007_199_254_740_991
 
+def bounded_label(value,name):
+    if not isinstance(value,str) or not value or len(value)>200 or any(ord(character)<32 or ord(character)==127 for character in value):
+        raise ValueError(f'{name} must be a control-free 1–200 character string')
+    return value
+
 def summarize(trace):
     if not isinstance(trace,dict) or type(trace.get('version')) is not int or trace.get('version') != 1 or not isinstance(trace.get('spans'),list):
         raise ValueError('Expected version 1 and a spans array')
     ids=set();tools=Counter();duration=0;tokens=0;failures=0
     for span in trace['spans']:
         if not isinstance(span,dict):raise ValueError('Each span must be an object')
-        identifier=span.get('id');tool=span.get('tool')
-        if not isinstance(identifier,str) or not identifier or identifier in ids:raise ValueError('Span IDs must be unique non-empty strings')
-        if not isinstance(tool,str) or not tool:raise ValueError('tool must be a non-empty string')
+        identifier=bounded_label(span.get('id'),'Span ID');tool=bounded_label(span.get('tool'),'tool')
+        if identifier in ids:raise ValueError('Span IDs must be unique')
         ids.add(identifier)
         ms=span.get('duration_ms');count=span.get('tokens',0)
         if type(ms) not in (int,float) or not math.isfinite(ms) or ms<0:raise ValueError('duration_ms must be finite and non-negative')
