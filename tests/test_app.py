@@ -3,7 +3,14 @@ from app import summarize
 class Tests(unittest.TestCase):
     def trace(self):return {'version':1,'spans':[{'id':'a','tool':'model','duration_ms':100,'tokens':8,'status':'error'}]}
     def test_summary(self):
-        s=summarize(self.trace());self.assertEqual((s['failures'],s['tokens'],s['summed_duration_ms']),(1,8,100))
+        s=summarize(self.trace());self.assertEqual((s['failures'],s['tokens'],s['summed_duration_ms']),(1,8,100));self.assertEqual(s['failure_types'],{'unclassified':1})
+    def test_failure_types_are_bounded_identifiers_on_error_spans_only(self):
+        t=self.trace();t['spans'][0]['error_type']='tool.timeout';self.assertEqual(summarize(t)['failure_types'],{'tool.timeout':1})
+        for value in ['', 'bad type', 'x'*129, 'bad\ntype']:
+            t=self.trace();t['spans'][0]['error_type']=value
+            with self.assertRaisesRegex(ValueError,'error_type'):summarize(t)
+        t=self.trace();t['spans'][0].update(status='ok',error_type='timeout')
+        with self.assertRaisesRegex(ValueError,'error_type'):summarize(t)
     def test_duplicates(self):
         t=self.trace();t['spans']*=2
         with self.assertRaises(ValueError):summarize(t)

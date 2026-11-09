@@ -21,7 +21,7 @@ Stream event types are limited to 128 identifier-like ASCII characters, using al
 
 `streaming_adapter.record_completed_stream` yields typed provider-neutral events unchanged and records usage only after an explicit terminal event and span completion. Every event requires a non-empty string type. A terminal event must include usage; events after completion and terminal events without accounting are rejected rather than silently accepting an ambiguous usage boundary. Input/output counts and their total must remain within JavaScript's JSON-safe integer range; an optional reported `total_tokens` must equal their sum. The synchronous OpenAI and Anthropic adapters and direct recorder metadata enforce the same upper bound. `record_openai_response_stream` maps the Responses API `response.completed.response.usage` shape; deltas pass through without retention and interrupted or inconsistent streams make no token claim.
 
-Trace format: a JSON object with `version: 1` and `spans`. Each span needs a unique, control-free 1–200 character string `id`, a control-free 1–200 character string `tool`, non-negative finite `duration_ms`, `status` (`ok` or `error`), and optional non-negative JSON-safe integer `tokens`. Imported and directly recorded labels follow the same bounds. Imported per-span token counts and their aggregate are bounded before summaries or reports are produced.
+Trace format: a JSON object with `version: 1` and `spans`. Each span needs a unique, control-free 1–200 character string `id`, a control-free 1–200 character string `tool`, non-negative finite `duration_ms`, `status` (`ok` or `error`), and optional non-negative JSON-safe integer `tokens`. Error spans may include a 1–128 character identifier-like `error_type`, such as `tool.timeout`; free-text exception messages remain outside the format. Summaries aggregate classified failures under `failure_types`, with missing classifications reported as `unclassified`. Imported and directly recorded labels follow the same bounds. Imported per-span token counts and their aggregate are bounded before summaries or reports are produced.
 
 Run `python app.py --help` for available options.
 
@@ -68,7 +68,7 @@ Streaming responses are intentionally unsupported because usage is not available
 python app.py examples/trace.json --html trace-report.html
 ```
 
-Open `trace-report.html` in a browser. The standalone report shows summary metrics, proportional timing bars and an interactive failures-only filter. It has no external fonts, scripts, analytics or network requests. Existing output files are not overwritten. Timeline positioning uses `start_ms` when supplied; traces without timestamps place spans at the same origin, so the report does not invent execution order.
+Open `trace-report.html` in a browser. The standalone report shows summary metrics, proportional timing bars, optional failure classifications and an interactive failures-only filter. It has no external fonts, scripts, analytics or network requests. Existing output files are not overwritten. Timeline positioning uses `start_ms` when supplied; traces without timestamps place spans at the same origin, so the report does not invent execution order.
 
 ## Hierarchy and timing
 
@@ -122,7 +122,7 @@ The dependency-free CLI in app.py validates and summarizes traces; dependencies.
 
 ## Limitations
 
-`summed_duration_ms` sums span durations; overlapping calls mean this is not wall-clock runtime. Tokens are supplied by the trace author, not measured by this tool. No live agent integrations or visual dashboard yet. Dependency-path analysis requires explicit leaf-span dependencies. Do not place secrets in traces.
+`summed_duration_ms` sums span durations; overlapping calls mean this is not wall-clock runtime. Tokens are supplied by the trace author, not measured by this tool. There is no live dashboard or continuous ingestion service; the HTML report is a generated offline file. Dependency-path analysis requires explicit leaf-span dependencies. Do not place secrets in traces.
 
 ## Running and deployment
 

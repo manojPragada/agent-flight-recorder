@@ -2,6 +2,7 @@
 import argparse
 import json
 import math
+import re
 import sys
 from collections import Counter
 from dependencies import dependency_path
@@ -16,7 +17,7 @@ def bounded_label(value,name):
 def summarize(trace):
     if not isinstance(trace,dict) or type(trace.get('version')) is not int or trace.get('version') != 1 or not isinstance(trace.get('spans'),list):
         raise ValueError('Expected version 1 and a spans array')
-    ids=set();tools=Counter();duration=0;tokens=0;failures=0
+    ids=set();tools=Counter();failure_types=Counter();duration=0;tokens=0;failures=0
     for span in trace['spans']:
         if not isinstance(span,dict):raise ValueError('Each span must be an object')
         identifier=bounded_label(span.get('id'),'Span ID');tool=bounded_label(span.get('tool'),'tool')
@@ -26,6 +27,10 @@ def summarize(trace):
         if type(ms) not in (int,float) or not math.isfinite(ms) or ms<0:raise ValueError('duration_ms must be finite and non-negative')
         if type(count) is not int or not 0<=count<=MAX_SAFE_TOKENS:raise ValueError('tokens must be a JSON-safe non-negative integer')
         if span.get('status') not in ('ok','error'):raise ValueError('status must be ok or error')
+        error_type=span.get('error_type')
+        if error_type is not None and (span['status']!='error' or not isinstance(error_type,str) or len(error_type)>128 or re.fullmatch(r'[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*',error_type) is None):
+            raise ValueError('error_type requires an error span and a bounded identifier-like value')
+        if span['status']=='error':failure_types[error_type or 'unclassified']+=1
         tools[tool]+=1;duration+=ms;tokens+=count;failures+=span['status']=='error'
         if tokens>MAX_SAFE_TOKENS:raise ValueError('Aggregated tokens must remain a JSON-safe integer')
     spans = {span['id']: span for span in trace['spans']}
@@ -80,7 +85,7 @@ def summarize(trace):
         timing = {'elapsed_ms': max(end for _, end in intervals) - intervals[0][0], 'busy_ms': busy}
     if not math.isfinite(duration):
         raise ValueError('Aggregated trace duration must be finite')
-    return {'span_count':len(ids),'failures':failures,'summed_duration_ms':duration,'tokens':tokens,'tools':dict(sorted(tools.items())),
+    return {'span_count':len(ids),'failures':failures,'failure_types':dict(sorted(failure_types.items())),'summed_duration_ms':duration,'tokens':tokens,'tools':dict(sorted(tools.items())),
             'tool_stats': tool_statistics(trace['spans']),
             'root_span_ids': sorted(roots), 'max_depth': max_depth, 'timing': timing, 'critical_path': dependency_path(spans)}
 
