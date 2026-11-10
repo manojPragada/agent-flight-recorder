@@ -20,6 +20,8 @@
 
 ## Continuity
 
+2026-11-10: Added an accessible offline failure-type selector that composes with the existing failures-only toggle and is populated exclusively from validated `error_type` identifiers. Next: add another vendor only after verifying its completion contract.
+
 2026-11-09: Added optional bounded `error_type` identifiers for failed spans, aggregate `failure_types` counts and offline timeline labels without retaining exception messages or payloads. Next: add another vendor only after verifying its completion contract.
 
 2026-11-08: Aligned imported and directly recorded span IDs/tool labels on a control-free 1–200 character contract, preventing oversized or terminal-shaping metadata from entering summaries and reports. Next: add another vendor only after verifying its completion contract.
