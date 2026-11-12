@@ -68,7 +68,7 @@ Streaming responses are intentionally unsupported because usage is not available
 python app.py examples/trace.json --html trace-report.html
 ```
 
-Open `trace-report.html` in a browser. The standalone report shows summary metrics, proportional timing bars, optional failure classifications, a failures-only toggle, a classification selector and an accessible live count of spans remaining after filters. The selector is built only from validated `error_type` identifiers; exception messages and payloads remain outside the report. It has no external fonts, scripts, analytics or network requests. Existing output files are not overwritten. Timeline positioning uses `start_ms` when supplied; traces without timestamps place spans at the same origin, so the report does not invent execution order.
+Open `trace-report.html` in a browser. The standalone report shows summary metrics, proportional timing bars, optional failure classifications, a failures-only toggle, a classification selector and an accessible live count plus summed duration for spans remaining after filters. The selector is built only from validated `error_type` identifiers; exception messages and payloads remain outside the report. Filtered duration is an inclusive sum and may double-count overlapping or nested work. The report has no external fonts, scripts, analytics or network requests. Existing output files are not overwritten. Timeline positioning uses `start_ms` when supplied; traces without timestamps place spans at the same origin, so the report does not invent execution order.
 
 ## Hierarchy and timing
 

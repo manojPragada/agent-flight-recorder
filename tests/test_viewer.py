@@ -10,7 +10,8 @@ class ViewerTests(unittest.TestCase):
         self.assertIn('2</b><span>SPANS',html);self.assertIn('3</b><span>REPORTED TOKENS',html);self.assertIn('tool.timeout',html)
         self.assertIn('<option value="tool.timeout">tool.timeout</option>',html)
         self.assertIn('data-failure="tool.timeout"',html)
-        self.assertIn('filter-status',html);self.assertIn('spans visible.',html);self.assertIn('aria-live',html)
+        self.assertIn('filter-status',html);self.assertIn('spans visible',html);self.assertIn('aria-live',html)
+        self.assertIn('data-duration="100"',html);self.assertIn('summed ms.',html)
 
     def test_failure_filter_contains_only_classifications(self):
         trace={'version':1,'spans':[{'id':'bad','tool':'shell','duration_ms':20,'status':'error','error_type':'tool.timeout'}]}

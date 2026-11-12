@@ -20,6 +20,8 @@
 
 ## Continuity
 
+2026-11-12: Added an accessible live summed-duration readout that follows the existing status and failure-classification filters. It is explicitly inclusive and may double-count nested or overlapping spans. Next: add another vendor only after verifying its completion contract.
+
 2026-11-11: Added an accessible live visible-span count that updates for the failures-only and failure-classification filters, including the initial unfiltered report state. The report still retains no exception text or payloads. Next: add another vendor only after verifying its completion contract.
 
 2026-11-10: Added an accessible offline failure-type selector that composes with the existing failures-only toggle and is populated exclusively from validated `error_type` identifiers. Next: add another vendor only after verifying its completion contract.
